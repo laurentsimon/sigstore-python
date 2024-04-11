@@ -186,7 +186,6 @@ class Verifier:
         #    signing certificate was valid at the time of signing.
         sign_date = materials.certificate.not_valid_before
         cert_ossl = X509.from_cryptography(materials.certificate)
-
         store.set_time(sign_date)
         store_ctx = X509StoreContext(store, cert_ossl)
         try:

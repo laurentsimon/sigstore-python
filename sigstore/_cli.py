@@ -688,7 +688,20 @@ def _sign(args: argparse.Namespace) -> None:
             logger.debug(f"signing for {file.name}")
             with file.open(mode="rb", buffering=0) as io:
                 try:
-                    result = signer.sign(input_=io)
+                    import in_toto_attestation.v1.resource_descriptor_pb2 as rdpb
+                    from in_toto_attestation.v1.statement import Statement
+                    subjects = []
+                    sub1 = rdpb.ResourceDescriptor()
+                    sub1.download_location = "path/tofile1"
+                    sub1.digest["alg1"] = "abc123"
+                    subjects += [sub1]
+                    sub1 = rdpb.ResourceDescriptor()
+                    sub1.download_location = "path/tofile2"
+                    sub1.digest["alg1"] = "abc123"
+                    subjects += [sub1]
+                    stmt = Statement(subjects, "https://github.com/openssf/model-signing/manifest/v1", {"keyObj": {"subKey": "subVal"}})
+                    result = signer.sign(input_=stmt)
+                    #result = signer.sign(input_=io)
                 except ExpiredIdentity as exp_identity:
                     print("Signature failed: identity token has expired")
                     raise exp_identity
